@@ -1,11 +1,21 @@
 <?php
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use Throwable;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
+
+
+
+
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
@@ -21,7 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($request->is('api/*') || $request->wantsJson()) {
 
-                // Validation error
                 if ($e instanceof ValidationException) {
                     return response()->json([
                         'success' => false,
@@ -30,7 +39,6 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], 422);
                 }
 
-                // Not authenticated
                 if ($e instanceof AuthenticationException) {
                     return response()->json([
                         'success' => false,
@@ -38,7 +46,6 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], 401);
                 }
 
-                // Not authorized
                 if ($e instanceof AuthorizationException) {
                     return response()->json([
                         'success' => false,
@@ -46,7 +53,6 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], 403);
                 }
 
-                // Model not found / route not found
                 if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
                     return response()->json([
                         'success' => false,
@@ -54,7 +60,6 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], 404);
                 }
 
-                // Generic HTTP exception (405, 429, etc.)
                 if ($e instanceof HttpException) {
                     return response()->json([
                         'success' => false,
@@ -62,7 +67,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], $e->getStatusCode());
                 }
 
-                // Fallback — সব ধরনের unexpected exception
+
                 return response()->json([
                     'success' => false,
                     'message' => config('app.debug') ? $e->getMessage() : 'Server error',
