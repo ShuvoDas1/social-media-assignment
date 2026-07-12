@@ -26,6 +26,12 @@ Route::prefix('v1')->group(function () {
             Route::post('store', [PostController::class, 'store'])->name('store');
             Route::put('{id}', [PostController::class, 'update'])->name('update');
             Route::delete('{id}', [PostController::class, 'delete'])->name('destroy');
+            Route::post('{postId}/reaction', [PostController::class, 'postReaction'])->name('post.reaction');
+            Route::post('{postId}/comment', [PostController::class, 'postComment'])->name('post.comment');
+            Route::post('comments/{commentId}/reaction', [PostController::class, 'commentReaction'])->name('post.comment.reaction');
+            Route::get('{postId}/comments', [PostController::class, 'postComments'])->name('post.comments');
+            Route::get('{postId}/reactions', [PostController::class, 'postReactions'])->name('post.reactions');
+
         });
     });
 });

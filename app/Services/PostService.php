@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\Post;
+use App\Models\PostComment;
+use App\Models\PostReaction;
+use Exception;
 
 
 class PostService
@@ -14,7 +17,7 @@ class PostService
 
     public function getAll(array $filters)
     {
-        $query = Post::with(['images',]);
+        $query = Post::with(['images', 'comments', 'reactions']);
 
         $limit = $filters["limit"] ?? 10;
         $page = $filters["page"] ?? 1;
@@ -32,6 +35,12 @@ class PostService
 
 
         return $query->paginate($limit);
+    }
+
+    public function getOne($id)
+    {
+        return Post::find($id);
+
     }
 
     public function store(array $data)
@@ -84,11 +93,68 @@ class PostService
 
     public function postReaction(array $data, $postId)
     {
-        $post = Post::findOrFail($postId);
-        $post->reactions()->create([
+
+        $post = $this->getOne($postId);
+
+        if (!$post)
+            throw new Exception("Post was not found!", 404);
+
+        if ($post->user_id !== auth()->id() && $post->isPrivate())
+            throw new Exception("You can't react to this post!", 403);
+
+        $response = $post->reactions()->updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'post_id' => $postId,
+            ],
+            [
+                'react' => $data['react'],
+            ]
+        );
+        return $response;
+    }
+
+    public function addComment(array $data, int $postId)
+    {
+        $post = $this->getOne($postId);
+        if (!$post)
+            throw new Exception("Post was not found!", 404);
+
+        if ($post->user_id !== auth()->id() && $post->isPrivate())
+            throw new Exception("You can't comment on this post!", 403);
+
+        $comment = $post->comments()->create([
             'user_id' => auth()->id(),
-            'react' => $data['react'],
+            'comment' => $data['comment'],
+            'parent_id' => $data['parent_id'] ?? null,
         ]);
-        return $post;
+        return $comment;
+    }
+
+    public function addCommentReaction(array $data, int $commentId)
+    {
+        $comment = PostComment::findOrFail($commentId);
+        $reaction = $comment->reactions()->updateOrCreate(
+            [
+                'comment_id' => $commentId,
+                'user_id' => auth()->id(),
+            ],
+            [
+                'react' => $data['react'],
+            ]
+        );
+        return $reaction;
+    }
+
+    public function getPostComments(int $postId, array $filters){
+        $query = PostComment::where('post_id', $postId)->topLevel()->reactionsCount()->latest()->with('user', 'reactions', 'replies');
+        $limit = $filters['limit'] ?? 10;
+        return $query->paginate($limit);
+    }
+
+    public function getPostReactions(int $postId, array $filters = []){
+        $query = PostReaction::where('post_id', $postId)->with('user')->latest();
+        $limit = $filters['limit'] ?? 10;
+        return $query->paginate($limit);
     }
 }

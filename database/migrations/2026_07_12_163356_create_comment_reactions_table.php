@@ -10,10 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('post_reactions', function (Blueprint $table) {
+        Schema::create('comment_reactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->comment('user id who reacted');
+            $table->foreignId('comment_id')->constrained('post_comments')->cascadeOnDelete();
+            $table->foreignId('user_id')->comment('user id who liked');
             $table->enum('react', ['like', 'unlike'])->nullable()->default(null)->comment('react type like or unlike');
             $table->timestamps();
         });
@@ -24,6 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('post_reactions');
+        Schema::dropIfExists('comment_likes');
     }
 };

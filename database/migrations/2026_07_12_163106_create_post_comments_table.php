@@ -4,18 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('post_reactions', function (Blueprint $table) {
+        Schema::create('post_comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->comment('user id who reacted');
-            $table->enum('react', ['like', 'unlike'])->nullable()->default(null)->comment('react type like or unlike');
+            $table->foreignId('user_id')->comment('user id who commented');
+            $table->foreignId('parent_id')->nullable()->constrained('post_comments')->cascadeOnDelete();
+            $table->text('comment')->comment('comment text');
             $table->timestamps();
+
+            $table->index(['post_id', 'parent_id']);
         });
     }
 
@@ -24,6 +28,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('post_reactions');
+        Schema::dropIfExists('post_comments');
     }
 };

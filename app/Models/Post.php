@@ -66,7 +66,10 @@ class Post extends Model
         return $this->hasMany(PostReaction::class);
     }
 
-
+    public function comments()
+    {
+        return $this->hasMany(PostComment::class)->topLevel()->reactionsCount()->latest()->with('user', 'reactions', 'replies');
+    }
 
     public function scopeReactionsCount($query)
     {
