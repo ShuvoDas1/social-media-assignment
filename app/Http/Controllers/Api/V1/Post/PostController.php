@@ -53,4 +53,24 @@ class PostController extends Controller
             return $this->errorResponse($th->getMessage(), $th->getCode());
         }
     }
+
+    public function show($id)
+    {
+        try {
+            $postData = $this->postService->show($id);
+            return $this->successResponse('Post fetched successfully', 200, PostResource::collection($postData));
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
+    }
+
+    public function postReaction(Request $request, $postId)
+    {
+        try {
+            $postData = $this->postService->postReaction($request->validated(), $postId);
+            return $this->successResponse('Post reaction updated successfully', 200, $postData);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }        
+    }
 }

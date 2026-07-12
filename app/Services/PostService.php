@@ -75,4 +75,20 @@ class PostService
         $post->delete();
         return $post;
     }
+
+    public function show($id)
+    {
+        $post = Post::with(['images', 'reactions'])->findOrFail($id);
+        return $post;
+    }
+
+    public function postReaction(array $data, $postId)
+    {
+        $post = Post::findOrFail($postId);
+        $post->reactions()->create([
+            'user_id' => auth()->id(),
+            'react' => $data['react'],
+        ]);
+        return $post;
+    }
 }

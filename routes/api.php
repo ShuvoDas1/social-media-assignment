@@ -22,6 +22,7 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('posts')->group(function () {
             Route::get('/', [PostController::class, 'index'])->name('index');
+            Route::get('/{id}', [PostController::class, 'show'])->name('show');
             Route::post('store', [PostController::class, 'store'])->name('store');
             Route::put('{id}', [PostController::class, 'update'])->name('update');
             Route::delete('{id}', [PostController::class, 'delete'])->name('destroy');
