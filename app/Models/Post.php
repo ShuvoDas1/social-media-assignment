@@ -18,15 +18,6 @@ class Post extends Model
         'visibility',
     ];
 
-    public function scopePublic($query)
-    {
-        return $query->where('visibility', self::VISIBLE_PUBLIC);
-    }
-
-    public function scopePrivate($query)
-    {
-        return $query->where('visibility', self::VISIBLE_PRIVATE);
-    }
 
     public function scopeByUser($query, $userId)
     {
@@ -36,6 +27,17 @@ class Post extends Model
     public function scopeOrderByCreated($query)
     {
         return $query->orderBy('created_at', 'desc');
+    }
+
+    public function scopeVisibleTo($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('visibility', self::VISIBLE_PUBLIC)
+                ->orWhere(function ($sub) {
+                    $sub->where('visibility', self::VISIBLE_PRIVATE)
+                        ->where('user_id', auth()->id());
+                });
+        });
     }
 
     public function isPublic()
@@ -57,6 +59,25 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reactions()
+    {
+        return $this->hasMany(PostReaction::class);
+    }
+
+
+
+    public function scopeReactionsCount($query)
+    {
+        return $query->withCount([
+            'reactions as like_count' => function ($query) {
+                $query->where('react', 'like');
+            },
+            'reactions as unlike_count' => function ($query) {
+                $query->where('react', 'unlike');
+            },
+        ]);
     }
 
 }

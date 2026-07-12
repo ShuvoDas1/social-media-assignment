@@ -12,6 +12,28 @@ class PostService
 
     }
 
+    public function getAll(array $filters)
+    {
+        $query = Post::with(['images',]);
+
+        $limit = $filters["limit"] ?? 10;
+        $page = $filters["page"] ?? 1;
+
+
+        if (isset($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+
+        if (isset($filters['visibility'])) {
+            $query->where('visibility', $filters['visibility']);
+        }
+
+        $query->visibleTo()->reactionsCount()->orderByCreated();
+
+
+        return $query->paginate($limit);
+    }
+
     public function store(array $data)
     {
         $post = Post::create([
