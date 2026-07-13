@@ -19,7 +19,7 @@ class PostService
     {
         $query = Post::with(['images', 'comments', 'reactions']);
 
-        $limit = $filters["limit"] ?? 10;
+        $limit = $filters["limit"] ?? 50;
         $page = $filters["page"] ?? 1;
 
 
@@ -102,15 +102,14 @@ class PostService
         if ($post->user_id !== auth()->id() && $post->isPrivate())
             throw new Exception("You can't react to this post!", 403);
 
-        $response = $post->reactions()->updateOrCreate(
-            [
+        if ($data['react'] === 'unlike') {
+            $response = $post->reactions()->where('user_id', auth()->id())->delete();
+        } else {
+            $response = $post->reactions()->create([
                 'user_id' => auth()->id(),
-                'post_id' => $postId,
-            ],
-            [
                 'react' => $data['react'],
-            ]
-        );
+            ]);
+        }
         return $response;
     }
 
@@ -146,13 +145,15 @@ class PostService
         return $reaction;
     }
 
-    public function getPostComments(int $postId, array $filters){
+    public function getPostComments(int $postId, array $filters)
+    {
         $query = PostComment::where('post_id', $postId)->topLevel()->reactionsCount()->latest()->with('user', 'reactions', 'replies');
         $limit = $filters['limit'] ?? 10;
         return $query->paginate($limit);
     }
 
-    public function getPostReactions(int $postId, array $filters = []){
+    public function getPostReactions(int $postId, array $filters = [])
+    {
         $query = PostReaction::where('post_id', $postId)->with('user')->latest();
         $limit = $filters['limit'] ?? 10;
         return $query->paginate($limit);

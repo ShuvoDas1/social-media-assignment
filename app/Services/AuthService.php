@@ -3,11 +3,12 @@
 namespace App\Services;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 
 class AuthService
@@ -88,4 +89,13 @@ class AuthService
         }
     }
 
+    public function getAuthUser(): User
+    {
+        try {
+            $user = Auth::guard('api')->user();
+            return $user;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

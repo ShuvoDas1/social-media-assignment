@@ -17,6 +17,7 @@ Route::prefix('v1')->group(function () {
     // Protected Routes
     Route::middleware('auth:api')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+        Route::get('me', [AuthController::class, 'getUser'])->name('me');
 
         // Posts
 

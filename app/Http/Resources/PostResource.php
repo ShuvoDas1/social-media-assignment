@@ -19,9 +19,10 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'content' => $this->content,
-            // 'visibility' => $this->visibility,
+            'visibility' => $this->visibility,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'is_liked' => $this->is_liked,
             'user' => [
                 'id' => $this->user_id,
                 'full_name' => $this->user->fname . " " . $this->user->lname,

@@ -64,4 +64,17 @@ class AuthController extends Controller
             return $this->errorResponse($th->getMessage(), $th->getCode());
         }
     }
+
+    public function getUser()
+    {
+        try {
+            $authUser = $this->authService->getAuthUser();
+            return $this->successResponse('Token data fetched successfully', 200, $authUser);
+        } catch (\Throwable $th) {
+            Log::channel('auth')->info("******* Get User Error*********");
+            Log::channel('auth')->info($th->getMessage());
+            Log::channel('auth')->info($th->getTraceAsString());
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
+    }
 }
