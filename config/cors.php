@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://6a56a6f0f20c06404fadc056--buddyscriptsocial.netlify.app'],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
