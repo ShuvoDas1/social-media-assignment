@@ -1,0 +1,1 @@
+'allowed_origins' => ['https://6a56a6f0f20c06404fadc056--buddyscriptsocial.netlify.app'],
