@@ -35,7 +35,7 @@ class Post extends Model
             $q->where('visibility', self::VISIBLE_PUBLIC)
                 ->orWhere(function ($sub) {
                     $sub->where('visibility', self::VISIBLE_PRIVATE)
-                        ->where('user_id', auth()->id());
+                        ->where('user_id', auth('api')->id());
                 });
         });
     }
