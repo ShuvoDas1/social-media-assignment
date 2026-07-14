@@ -80,6 +80,9 @@ class AuthService
     {
         try {
             $user = Auth::guard('api')->user();
+            if (!$user) {
+                return true;
+            }
             $user->last_logout_at = now();
             $user->save();
             Auth::guard('api')->logout();
