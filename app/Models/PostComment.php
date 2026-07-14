@@ -47,8 +47,14 @@ class PostComment extends Model
             'reactions as unlike_count' => function ($query) {
                 $query->where('react', 'unlike');
             },
+            'reactions as is_liked' => function ($query) {
+                $query->where('react', 'like')
+                    ->where('user_id', auth()->id());
+            },
         ]);
     }
+
+
 
     public function scopeTopLevel($query)
     {

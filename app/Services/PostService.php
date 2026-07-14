@@ -133,16 +133,16 @@ class PostService
     public function addCommentReaction(array $data, int $commentId)
     {
         $comment = PostComment::findOrFail($commentId);
-        $reaction = $comment->reactions()->updateOrCreate(
-            [
-                'comment_id' => $commentId,
+        $existingReaction = $comment->reactions()->where('user_id', auth()->id())->first();
+        if ($existingReaction) {
+            $existingReaction->delete();
+        } else {
+            $response = $comment->reactions()->create([
                 'user_id' => auth()->id(),
-            ],
-            [
                 'react' => $data['react'],
-            ]
-        );
-        return $reaction;
+            ]);
+        }
+        return $response;
     }
 
     public function getPostComments(int $postId, array $filters)
