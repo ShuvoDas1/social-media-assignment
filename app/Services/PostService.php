@@ -136,12 +136,12 @@ class PostService
         $existingReaction = $comment->reactions()->where('user_id', auth()->id())->first();
         if ($existingReaction) {
             $existingReaction->delete();
-        } else {
-            $response = $comment->reactions()->create([
-                'user_id' => auth()->id(),
-                'react' => $data['react'],
-            ]);
         }
+
+        $response = $comment->reactions()->create([
+            'user_id' => auth()->id(),
+            'react' => $data['react'],
+        ]);
         return $response;
     }
 
